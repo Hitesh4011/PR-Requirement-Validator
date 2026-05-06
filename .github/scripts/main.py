@@ -16,7 +16,7 @@ def main():
 
     # Read diff file
     try:
-        with open("diff.txt", "r") as f:
+        with open("files.txt", "r") as f:
             diff = f.read()
             print("Diff file loaded successfully")
             print(f"Diff length: {len(diff)} characters")

@@ -34,7 +34,7 @@ jobs:
       # 5. Generate diff file
       - name: Generate Diff
         run: |
-          git diff origin/${{ github.event.pull_request.base.ref }}...HEAD > diff.txt
+          git diff --name-status origin/${{ github.event.pull_request.base.ref }}...HEAD > files.txt
 
       # 6. Run main automation script
       - name: Run Validation Script
