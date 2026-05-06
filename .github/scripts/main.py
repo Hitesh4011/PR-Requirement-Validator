@@ -20,6 +20,7 @@ def main():
             diff = f.read()
             print("Diff file loaded successfully")
             print(f"Diff length: {len(diff)} characters")
+            print(f"--- Diff Content ---\n{diff}\n-------------------")
     except Exception as e:
         print("Error reading diff:", str(e))
 
