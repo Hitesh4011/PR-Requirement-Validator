@@ -37,7 +37,12 @@ def build_context():
 
     for f in files:
         if f["type"] == "D":
-            continue  # skip deleted files
+            context.append({
+                "file": f["file"],
+                "type": "DELETED",
+                "content": "This file was deleted in this PR."
+            })
+            continue
 
         content = get_file_content(f["file"])
 

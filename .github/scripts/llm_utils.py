@@ -1,4 +1,5 @@
 import os
+import json
 import google.generativeai as genai
 
 from config import GEMINI_API_KEY
@@ -41,4 +42,17 @@ def analyze(ticket, context):
 
     response = model.generate_content(prompt)
 
-    return response.text
+    text = response.text
+
+    try:
+        parsed = json.loads(text)
+        return parsed
+    except Exception:
+        return {
+            "status": "REJECTED",
+            "issues": [{
+                "type": "FORMAT_ERROR",
+                "message": "LLM did not return valid JSON"
+            }],
+            "summary": text[:500]
+        }

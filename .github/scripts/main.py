@@ -36,11 +36,19 @@ def main():
         )
         return
 
+    if ticket["status"].lower() in ["done", "closed"]:
+        post_comment(
+            repo,
+            pr_number,
+            f"⚠ Ticket `{ticket['id']}` is already closed."
+        )
+        return
+
     # === Step 3: Build Code Context ===
     context = build_context()
 
-    if not context:
-        post_comment(
+    if not context or all(not f["content"] for f in context):
+        post_comment(   
             repo,
             pr_number,
             "⚠ No code changes detected."
