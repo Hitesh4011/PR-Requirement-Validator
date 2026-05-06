@@ -12,6 +12,8 @@ jobs:
       # 1. Checkout code
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       # 2. Setup Python
       - name: Setup Python
@@ -27,7 +29,7 @@ jobs:
       # 4. Fetch base branch (important for diff)
       - name: Fetch Base Branch
         run: |
-          git fetch origin ${{ github.event.pull_request.base.ref }}
+          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
 
       # 5. Generate diff file
       - name: Generate Diff
