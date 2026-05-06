@@ -1,7 +1,9 @@
 import os
-from openai import OpenAI
+import google.generativeai as genai
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+from config import GEMINI_API_KEY
+
+genai.configure(api_key=GEMINI_API_KEY)
 
 
 def load_prompt():
@@ -10,9 +12,6 @@ def load_prompt():
 
 
 def format_code_context(context):
-    """
-    Convert file context into readable format for LLM
-    """
     formatted = []
 
     for file in context:
@@ -38,13 +37,8 @@ def build_prompt(ticket, context):
 def analyze(ticket, context):
     prompt = build_prompt(ticket, context)
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a strict code reviewer."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.2
-    )
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
-    return response.choices[0].message.content
+    response = model.generate_content(prompt)
+
+    return response.text

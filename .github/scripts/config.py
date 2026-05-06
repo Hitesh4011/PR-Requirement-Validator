@@ -9,4 +9,4 @@ JIRA_EMAIL = os.getenv("JIRA_EMAIL")
 JIRA_URL = os.getenv("JIRA_URL")
 
 # OpenAI
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")

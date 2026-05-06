@@ -43,7 +43,7 @@ jobs:
           JIRA_API_KEY: ${{ secrets.JIRA_API_KEY }}
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_URL: ${{ secrets.JIRA_URL }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           BRANCH_NAME: ${{ github.head_ref }}
           REPO: ${{ github.repository }}
