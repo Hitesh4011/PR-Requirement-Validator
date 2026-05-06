@@ -1,30 +1,67 @@
 import os
 
-def main():
-    print("=== PR VALIDATION STARTED ===")
+from parser import extract_ticket_id
+from jira_utils import get_ticket
+from diff_utils import build_context
+from llm_utils import analyze
+from github_utils import post_comment, format_result
 
-    # Read env variables passed from workflow
+
+def main():
+    # === Read ENV ===
     pr_title = os.getenv("PR_TITLE")
     branch_name = os.getenv("BRANCH_NAME")
     repo = os.getenv("REPO")
     pr_number = os.getenv("PR_NUMBER")
 
-    print(f"PR Title: {pr_title}")
-    print(f"Branch: {branch_name}")
-    print(f"Repo: {repo}")
-    print(f"PR Number: {pr_number}")
+    # === Step 1: Extract Ticket ID ===
+    ticket_id = extract_ticket_id(pr_title, branch_name)
 
-    # Read diff file
+    if not ticket_id:
+        post_comment(
+            repo,
+            pr_number,
+            "❌ No ticket ID found in PR title or branch name. Please follow naming convention (e.g., PROJ-123)."
+        )
+        return
+
+    # === Step 2: Fetch Jira Ticket ===
+    ticket = get_ticket(ticket_id)
+
+    if not ticket:
+        post_comment(
+            repo,
+            pr_number,
+            f"❌ Unable to fetch Jira ticket `{ticket_id}`. Check ticket ID or permissions."
+        )
+        return
+
+    # === Step 3: Build Code Context ===
+    context = build_context()
+
+    if not context:
+        post_comment(
+            repo,
+            pr_number,
+            "⚠ No code changes detected."
+        )
+        return
+
+    # === Step 4: LLM Analysis ===
     try:
-        with open("files.txt", "r") as f:
-            diff = f.read()
-            print("Diff file loaded successfully")
-            print(f"Diff length: {len(diff)} characters")
-            print(f"--- Diff Content ---\n{diff}\n-------------------")
+        result = analyze(ticket, context)
     except Exception as e:
-        print("Error reading diff:", str(e))
+        post_comment(
+            repo,
+            pr_number,
+            f"❌ LLM analysis failed: {str(e)}"
+        )
+        return
 
-    print("=== SCRIPT COMPLETED ===")
+    # === Step 5: Format & Post Result ===
+    formatted = format_result(result)
+    post_comment(repo, pr_number, formatted)
+
 
 if __name__ == "__main__":
     main()
