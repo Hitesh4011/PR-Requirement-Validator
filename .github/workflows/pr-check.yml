@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   validate-pr:
     runs-on: ubuntu-latest
@@ -37,6 +41,6 @@ jobs:
           BRANCH_NAME: ${{ github.head_ref }}
           REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          
+
         run: |
           python .github/scripts/main.py
