@@ -1,55 +1,37 @@
-import subprocess
+import requests
+import os
 
+def get_pr_files():
+    repo = os.getenv("REPO")
+    pr_number = os.getenv("PR_NUMBER")
+    token = os.getenv("GITHUB_TOKEN")
 
-def get_changed_files():
-    files = []
+    url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}/files"
 
-    with open("files.txt", "r") as f:
-        for line in f:
-            parts = line.strip().split("\t")
-            if len(parts) >= 2:
-                change_type = parts[0]
-                file_path = parts[-1]
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github+json"
+    }
 
-                files.append({
-                    "type": change_type,
-                    "file": file_path
-                })
+    response = requests.get(url, headers=headers)
 
-    return files
+    if response.status_code != 200:
+        return []
 
-
-def get_file_content(file_path):
-    try:
-        result = subprocess.run(
-            ["git", "show", f"HEAD:{file_path}"],
-            capture_output=True,
-            text=True
-        )
-        return result.stdout
-    except Exception:
-        return ""
+    return response.json()
 
 
 def build_context():
-    files = get_changed_files()
+    files = get_pr_files()
     context = []
 
     for f in files:
-        if f["type"] == "D":
-            context.append({
-                "file": f["file"],
-                "type": "DELETED",
-                "content": "This file was deleted in this PR."
-            })
-            continue
-
-        content = get_file_content(f["file"])
-
         context.append({
-            "file": f["file"],
-            "type": f["type"],
-            "content": content[:2000]  # limit size
+            "file": f.get("filename"),
+            "type": f.get("status"),
+            "content": f.get("patch", "")
         })
+
+    print(context)
 
     return context

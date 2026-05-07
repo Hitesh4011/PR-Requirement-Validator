@@ -12,8 +12,6 @@ jobs:
       # 1. Checkout code
       - name: Checkout Repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       # 2. Setup Python
       - name: Setup Python
@@ -26,17 +24,7 @@ jobs:
         run: |
           pip install -r .github/requirements.txt
 
-      # 4. Fetch base branch (important for diff)
-      - name: Fetch Base Branch
-        run: |
-          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
-
-      # 5. Generate diff file
-      - name: Generate Diff
-        run: |
-          git diff --name-status origin/${{ github.event.pull_request.base.ref }}...HEAD > files.txt
-
-      # 6. Run main automation script
+      # 4. Run main automation script
       - name: Run Validation Script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,9 +32,11 @@ jobs:
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_URL: ${{ secrets.JIRA_URL }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
           PR_TITLE: ${{ github.event.pull_request.title }}
           BRANCH_NAME: ${{ github.head_ref }}
           REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          
         run: |
           python .github/scripts/main.py
