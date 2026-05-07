@@ -15,7 +15,7 @@ def main():
     pr_number = os.getenv("PR_NUMBER")
 
     # === Step 1: Extract Ticket ID ===
-    ticket_id = extract_ticket_id(pr_title, branch_name)
+    ticket_id = extract_ticket_id(branch_name)
 
     if not ticket_id:
         post_comment(
