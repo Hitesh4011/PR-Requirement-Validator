@@ -35,6 +35,21 @@ def main():
             f"❌ Unable to fetch Jira ticket `{ticket_id}`. Check ticket ID or permissions."
         )
         return
+    
+    # check for ticket status
+    allowed_status = ["in progress", "in review"]
+
+    ticket_status = ticket["status"].lower()
+
+    if ticket_status not in allowed_status:
+        post_comment(
+            repo,
+            pr_number,
+            f"❌ Ticket `{ticket['id']}` is in invalid status `{ticket['status']}`.\n\n"
+            f"Allowed statuses: In Progress, In Review"
+        )
+        return
+
 
     if ticket["status"].lower() in ["done", "closed"]:
         post_comment(
