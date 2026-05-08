@@ -29,16 +29,16 @@ VALIDATION RULES:
 
 OUTPUT FORMAT (STRICT JSON):
 
-{
+{{
   "status": "APPROVED | WARNING | REJECTED",
   "issues": [
-    {
+    {{
       "type": "TICKET_MISMATCH | BUG | UNNECESSARY_CODE",
       "message": "clear explanation"
-    }
+    }}
   ],
   "summary": "final decision explanation"
-}
+}}
 
 ---
 
