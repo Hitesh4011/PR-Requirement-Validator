@@ -1,11 +1,11 @@
 import os
 import json
-import google.generativeai as genai
+from google import genai
 import re
 
 from config import GEMINI_API_KEY
 
-genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 def load_prompt():
@@ -41,11 +41,10 @@ def analyze(ticket, context):
 
     print(f"prompt: {prompt}")
 
-    model = genai.GenerativeModel("gemini-1.5-flash-8b")
-
-    print(f"we are getting the mode as {model}")
-
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=prompt,
+    )
 
     print(f"we are getting response with {response}")
 
