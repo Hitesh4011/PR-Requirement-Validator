@@ -39,7 +39,7 @@ def build_prompt(ticket, context):
 def analyze(ticket, context):
     prompt = build_prompt(ticket, context)
 
-    prompt(f"prompt: {prompt}")
+    print(f"prompt: {prompt}")
 
     model = genai.GenerativeModel("gemini-1.5-flash")
 
