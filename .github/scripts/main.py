@@ -28,6 +28,8 @@ def main():
     # === Step 2: Fetch Jira Ticket ===
     ticket = get_ticket(ticket_id)
 
+    print(ticket)
+
     if not ticket:
         post_comment(
             repo,
@@ -50,17 +52,10 @@ def main():
         )
         return
 
-
-    if ticket["status"].lower() in ["done", "closed"]:
-        post_comment(
-            repo,
-            pr_number,
-            f"⚠ Ticket `{ticket['id']}` is already closed."
-        )
-        return
-
     # === Step 3: Build Code Context ===
     context = build_context()
+
+    print(context)
 
     if not context or all(not f["content"] for f in context):
         post_comment(   
@@ -73,6 +68,7 @@ def main():
     # === Step 4: LLM Analysis ===
     try:
         result = analyze(ticket, context)
+        print(result)
     except Exception as e:
         post_comment(
             repo,

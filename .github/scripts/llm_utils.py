@@ -1,6 +1,7 @@
 import os
 import json
 import google.generativeai as genai
+import re
 
 from config import GEMINI_API_KEY
 
@@ -42,11 +43,25 @@ def analyze(ticket, context):
 
     response = model.generate_content(prompt)
 
-    text = response.text
+    text = response.text.strip()
+
+    # Extract JSON block safely
+    match = re.search(r"\{.*\}", text, re.DOTALL)
+
+    if not match:
+        return {
+            "status": "REJECTED",
+            "issues": [{
+                "type": "FORMAT_ERROR",
+                "message": "LLM did not return valid JSON"
+            }],
+            "summary": text[:300]
+        }
+
+    json_text = match.group(0)
 
     try:
-        parsed = json.loads(text)
-        return parsed
+        return json.loads(json_text)
     except Exception:
         return {
             "status": "REJECTED",
