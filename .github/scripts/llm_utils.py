@@ -41,6 +41,10 @@ def analyze(ticket, context):
 
     print(f"prompt: {prompt}")
 
+    for model in client.models.list():
+        print(f"Model Name: {model.name}")
+        print(f"Supported Actions: {model.supported_generation_methods}\n")
+
     response = client.models.generate_content(
         model="gemini-1.5-flash",
         contents=prompt,
