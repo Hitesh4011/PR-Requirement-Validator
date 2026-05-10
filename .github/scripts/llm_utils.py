@@ -43,7 +43,8 @@ def analyze(ticket, context):
 
     for model in client.models.list():
         print(f"Model Name: {model.name}")
-        print(f"Supported Actions: {model.supported_generation_methods}\n")
+        print(f"Display Name: {model.display_name}")
+        print(f"Description: {model.description}\n")
 
     response = client.models.generate_content(
         model="gemini-1.5-flash",
