@@ -47,7 +47,7 @@ def analyze(ticket, context):
         print(f"Description: {model.description}\n")
 
     response = client.models.generate_content(
-        model="gemini-1.5-flash",
+        model="gemini-flash-latest",
         contents=prompt,
     )
 
