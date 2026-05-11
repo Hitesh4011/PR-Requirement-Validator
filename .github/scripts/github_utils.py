@@ -19,16 +19,40 @@ def post_comment(repo: str, pr_number: str, message: str):
     return response.status_code
 
 
-def format_result(result: str):
+def format_result(result: dict):
     """
-    Format LLM output for better PR readability
+    Format LLM output (dict) into a professional Markdown report for PR readability.
     """
+    status = result.get("status", "UNKNOWN").upper()
+    summary = result.get("summary", "No summary provided.")
+    issues = result.get("issues", [])
 
-    return f"""
-## 🤖 Automated PR Review
+    # Map status to emojis
+    emojis = {
+        "APPROVED": "✅",
+        "WARNING": "⚠️",
+        "REJECTED": "❌"
+    }
+    emoji = emojis.get(status, "🔍")
 
-{result}
+    # Build the Markdown lines
+    lines = [
+        f"## 🤖 Automated PR Review: **{status}** {emoji}",
+        "",
+        "### 📝 Summary",
+        summary,
+        ""
+    ]
 
----
-**Note:** This review is AI-generated. Please verify before merging.
-"""
+    if issues:
+        lines.append("### 🚩 Issues Found")
+        for issue in issues:
+            itype = issue.get("type", "ISSUE")
+            msg = issue.get("message", "No details provided.")
+            lines.append(f"- **[{itype}]**: {msg}")
+        lines.append("")
+
+    lines.append("---")
+    lines.append("**Note:** This review is AI-generated. Please verify manually before merging.")
+
+    return "\n".join(lines)

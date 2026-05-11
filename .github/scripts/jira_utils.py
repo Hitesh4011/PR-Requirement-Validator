@@ -1,4 +1,5 @@
 import requests
+import re
 from config import JIRA_API_KEY, JIRA_EMAIL, JIRA_URL
 
 
@@ -39,26 +40,76 @@ def get_ticket(ticket_id: str):
     }
 
 
-def extract_description(desc):
+def extract_description(node):
     """
-    Jira description can be complex JSON → flatten it
+    Recursively extract text from Jira ADF (Atlassian Document Format),
+    preserving structure like lists, headings, and tables in Markdown.
     """
-
-    if not desc:
+    if not node:
         return ""
 
-    # If already string
-    if isinstance(desc, str):
-        return desc
+    if isinstance(node, str):
+        return node
 
-    text_parts = []
+    parts = []
 
-    try:
-        for block in desc.get("content", []):
-            for inner in block.get("content", []):
-                if "text" in inner:
-                    text_parts.append(inner["text"])
-    except Exception:
-        pass
+    def walk(n):
+        if not n:
+            return
+        if isinstance(n, list):
+            for item in n:
+                walk(item)
+            return
 
-    return " ".join(text_parts)
+        ntype = n.get("type")
+
+        # Text nodes
+        if ntype == "text":
+            parts.append(n.get("text", ""))
+
+        # Structure nodes
+        elif ntype == "paragraph":
+            parts.append("\n")
+            walk(n.get("content", []))
+            parts.append("\n")
+        elif ntype == "heading":
+            level = n.get("attrs", {}).get("level", 1)
+            parts.append("\n" + ("#" * level) + " ")
+            walk(n.get("content", []))
+            parts.append("\n")
+        elif ntype == "bulletList" or ntype == "orderedList":
+            parts.append("\n")
+            walk(n.get("content", []))
+            parts.append("\n")
+        elif ntype == "listItem":
+            parts.append("\n- ")
+            walk(n.get("content", []))
+        elif ntype == "table":
+            parts.append("\n")
+            walk(n.get("content", []))
+            parts.append("\n")
+        elif ntype == "tableRow":
+            parts.append("\n| ")
+            walk(n.get("content", []))
+        elif ntype == "tableHeader" or ntype == "tableCell":
+            walk(n.get("content", []))
+            parts.append(" | ")
+        elif ntype == "codeBlock":
+            parts.append("\n```\n")
+            walk(n.get("content", []))
+            parts.append("\n```\n")
+        elif ntype == "hardBreak":
+            parts.append("\n")
+        else:
+            # Fallback for unknown types: just keep digging for content
+            walk(n.get("content", []))
+
+    walk(node)
+
+    # Clean up:
+    # 1. Join all parts
+    text = "".join(parts)
+    # 2. Collapse 3 or more newlines into 2 (one blank line)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    # 3. Trim whitespace
+    return text.strip()
