@@ -31,18 +31,28 @@ def format_result(result: dict):
     emojis = {
         "APPROVED": "✅",
         "WARNING": "⚠️",
-        "REJECTED": "❌"
+        "REJECTED": "❌",
+        "FAILED": "💥"
     }
     emoji = emojis.get(status, "🔍")
 
     # Build the Markdown lines
-    lines = [
-        f"## 🤖 Automated PR Review: **{status}** {emoji}",
-        "",
-        "### 📝 Summary",
-        summary,
-        ""
-    ]
+    if status == "FAILED":
+        lines = [
+            f"## 🤖 Automated PR Review Failed {emoji}",
+            "",
+            "### 📝 Summary",
+            summary,
+            ""
+        ]
+    else:
+        lines = [
+            f"## 🤖 Automated PR Review: **{status}** {emoji}",
+            "",
+            "### 📝 Summary",
+            summary,
+            ""
+        ]
 
     if issues:
         lines.append("### 🚩 Issues Found")

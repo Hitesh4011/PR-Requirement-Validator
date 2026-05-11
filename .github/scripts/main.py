@@ -70,12 +70,22 @@ def main():
         result = analyze(ticket, context)
         print(result)
     except Exception as e:
-        post_comment(
-            repo,
-            pr_number,
-            f"❌ LLM analysis failed: {str(e)}"
-        )
-        return
+        # Extract the exact error type and message from the AI model
+        error_type = type(e).__name__
+        error_message = str(e)
+        
+        print(f"Error Type: {error_type}")
+        print(f"Error Message: {error_message}")
+
+        # Convert the system error into a structured response so it uses the standard UI
+        result = {
+            "status": "FAILED",
+            "issues": [{
+                "type": f"SYSTEM_ERROR_{error_type.upper()}",
+                "message": error_message
+            }],
+            "summary": "The AI service encountered a technical error and could not complete the review. Please try again later."
+        }
 
     # === Step 5: Format & Post Result ===
     formatted = format_result(result)
