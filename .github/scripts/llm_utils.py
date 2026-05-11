@@ -54,24 +54,24 @@ def analyze(ticket, context):
             except ValueError:
                 if response.candidates and response.candidates[0].finish_reason == "SAFETY":
                     return {
-                        "status": "REJECTED",
+                        "status": "FAILED",
                         "issues": [{
-                            "type": "SAFETY_BLOCK",
-                            "message": "The AI refused to review this code due to safety policy violations."
+                            "type": "SAFETY_POLICY_VIOLATION",
+                            "message": "The AI model refused to process the request because it triggered safety filters. This usually happens if the code contains sensitive data, credentials, or restricted content."
                         }],
-                        "summary": "AI review was blocked by safety filters."
+                        "summary": "Automated review aborted due to LLMs GenAI safety policy restrictions."
                     }
                 raise
 
             match = re.search(r"\{.*\}", text, re.DOTALL)
             if not match:
                 return {
-                    "status": "REJECTED",
+                    "status": "FAILED",
                     "issues": [{
-                        "type": "FORMAT_ERROR",
-                        "message": "LLM did not return valid JSON"
+                        "type": "JSON_EXTRACTION_FAILED",
+                        "message": "The AI model provided a response, but it did not contain a valid JSON block enclosed in `{}` as strictly requested."
                     }],
-                    "summary": text[:300]
+                    "summary": f"Failed to extract JSON from AI response. Snippet: {text[:150]}..."
                 }
 
             json_text = match.group(0)
@@ -79,12 +79,12 @@ def analyze(ticket, context):
                 return json.loads(json_text)
             except Exception:
                 return {
-                    "status": "REJECTED",
+                    "status": "FAILED",
                     "issues": [{
-                        "type": "FORMAT_ERROR",
-                        "message": "LLM did not return valid JSON"
+                        "type": "JSON_PARSE_ERROR",
+                        "message": "The AI model returned a JSON block, but it was malformed and could not be parsed (e.g., trailing commas, unescaped quotes)."
                     }],
-                    "summary": text[:500]
+                    "summary": f"JSON decoding failed. Snippet: {json_text[:150]}..."
                 }
 
         except Exception as e:
