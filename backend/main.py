@@ -1,7 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from database import get_db_connection
 
 app = FastAPI(title="Task Manager API")
+
+@app.on_event("startup")
+def startup_db_test():
+    try:
+        conn = get_db_connection()
+        conn.close()
+        print("Database connection tested successfully.")
+    except Exception as e:
+        print(f"Database connection failed: {e}")
+        raise e
+
 
 app.add_middleware(
     CORSMiddleware,
