@@ -4,7 +4,7 @@ USE task_manager;
 
 CREATE TABLE IF NOT EXISTS tasks (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(10) NOT NULL,
+    title VARCHAR(255) NOT NULL,
     description TEXT,
     status ENUM('todo', 'in_progress', 'done') DEFAULT 'todo',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -12,5 +12,6 @@ CREATE TABLE IF NOT EXISTS tasks (
     INDEX idx_status (status),
     INDEX idx_created_at (created_at)
 ) 
-ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
