@@ -1,4 +1,5 @@
 import mysql.connector
+from contextlib import contextmanager
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
 
 def get_db_connection():
@@ -8,4 +9,12 @@ def get_db_connection():
         password=DB_PASSWORD,
         database=DB_NAME
     )
+    return connection
 
+@contextmanager
+def get_db():
+    conn = get_db_connection()
+    try:
+        yield conn
+    finally:
+        conn.close()

@@ -1,11 +1,11 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import get_db_connection
 
-app = FastAPI(title="Task Manager API")
-
-@app.on_event("startup")
-def startup_db_test():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Database connection testing on application startup
     try:
         conn = get_db_connection()
         conn.close()
@@ -13,6 +13,9 @@ def startup_db_test():
     except Exception as e:
         print(f"Database connection failed: {e}")
         raise e
+    yield
+
+app = FastAPI(title="Task Manager API", lifespan=lifespan)
 
 
 app.add_middleware(
