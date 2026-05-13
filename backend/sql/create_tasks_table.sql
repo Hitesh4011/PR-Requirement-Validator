@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     description TEXT,
     status ENUM('todo', 'in_progress', 'done') DEFAULT 'todo',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_status (status),
     INDEX idx_created_at (created_at)
 ) 
