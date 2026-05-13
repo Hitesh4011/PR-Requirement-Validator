@@ -1,3 +1,9 @@
 JIRA_Tickets_Task_Manager.md
 AI_Review_Test_Plan.md
 DEVELOPMENT_WORKFLOW_PROTOCOL.md
+
+# Python
+.env
+__pycache__/
+*.pyc
+venv/
