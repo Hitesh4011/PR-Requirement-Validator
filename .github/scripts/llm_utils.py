@@ -44,7 +44,7 @@ def analyze(ticket, context):
     for attempt in range(3):
         try:
             response = client.models.generate_content(
-                model="gemini-flash-latest",
+                model="gemini-2.5-flash-lite",
                 contents=prompt,
             )
             print(f"we are getting response with {response}")
