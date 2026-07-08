@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import get_db_connection
+from routes import task_routes
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,8 +16,10 @@ async def lifespan(app: FastAPI):
         raise e
     yield
 
+
 app = FastAPI(title="Task Manager API", lifespan=lifespan)
 
+app.include_router(task_routes.router)
 
 app.add_middleware(
     CORSMiddleware,
